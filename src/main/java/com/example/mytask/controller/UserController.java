@@ -1,9 +1,14 @@
 package com.example.mytask.controller;
 
-import com.example.mytask.service.IntegrationGateway;
+import com.example.mytask.model.dto.UserDTO;
+import com.example.mytask.payload.DataResponse;
+import com.example.mytask.config.IntegrationGateway;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.example.mytask.model.User;
@@ -19,21 +24,23 @@ public class UserController {
 //
 //  }
 
-  @GetMapping()
-  public User getUser() {
-    User user = new User();
-    System.out.println(user.toString());
-    return integrationGateway.invoke(user, "GET_USER");
+  @GetMapping("/{id}")
+  public DataResponse getUser(@PathVariable int id) {
+    return integrationGateway.invoke(id, "GET_USER");
   }
 
-  @PostMapping()
-  public User createUser() {
-
+  @PostMapping("/create")
+  public DataResponse createUser(@RequestBody UserDTO userDTO) {
+    ModelMapper modelMapper = new ModelMapper();
+    User user = modelMapper.map(userDTO, User.class);
+    return integrationGateway.invoke(user, "CREATE_USER");
   }
 
-  @PostMapping()
-  public User editUser() {
-
+  @PostMapping("/edit")
+  public DataResponse editUser(@RequestBody UserDTO userDTO) {
+    ModelMapper modelMapper = new ModelMapper();
+    User user = modelMapper.map(userDTO, User.class);
+    return integrationGateway.invoke(user, "EDIT_USER");
   }
 
 }

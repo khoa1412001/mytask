@@ -1,7 +1,6 @@
-package com.example.mytask.service;
+package com.example.mytask.config;
 
-import com.example.mytask.model.User;
-import org.json.JSONObject;
+import com.example.mytask.payload.DataResponse;
 import org.springframework.integration.annotation.Gateway;
 import org.springframework.integration.annotation.MessagingGateway;
 import org.springframework.messaging.handler.annotation.Header;
@@ -11,6 +10,6 @@ import org.springframework.messaging.handler.annotation.Payload;
 public interface IntegrationGateway {
 
   @Gateway(requestChannel = "INPUT_CHANNEL", replyChannel = "OUTPUT_CHANNEL")
-  <T> T invoke(@Payload T payload, @Header("action") String action);
+  <T> DataResponse invoke(@Payload T payload, @Header("action") String action);
 
 }

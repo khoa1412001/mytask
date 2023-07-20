@@ -3,10 +3,15 @@ package com.example.mytask.model;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
+import javax.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
 @Entity
+@Table(name = "user")
 @Getter
 @Setter
 public class User {
@@ -22,11 +27,34 @@ public class User {
   private String role;
 
   public User() {
-    this.name = "sheesh";
-    this.dob = "sheesh";
-    this.email = "sheesh";
-    this.phone = "sheesh";
-    this.office = "sheesh";
-    this.role = "sheesh";
+
+  }
+
+  //  @PreUpdate
+//  @PrePersist
+//  public void pre() {
+//    switch (this.role) {
+//      case "Scrum master":
+//        this.role = "Scrum master";
+//        break;
+//      case "Project owner":
+//        this.role = "Project owner";
+//        break;
+//      case "Member":
+//        this.role = "Member";
+//        break;
+//      default:
+//        this.role = "Other";
+//    }
+//  }
+  @PrePersist
+  @PreUpdate
+  public void preUp() {
+    System.out.println("both");
+  }
+
+  @Override
+  public String toString() {
+    return String.format("%s %s", this.id, this.name);
   }
 }
