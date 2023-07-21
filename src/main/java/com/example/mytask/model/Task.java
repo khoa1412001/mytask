@@ -4,6 +4,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
@@ -20,11 +21,12 @@ public class Task {
 
   @Id
   @GeneratedValue
-  private int id;
+  private Integer id;
   private String title;
   private String status;
   @OneToOne()
-  private String assignee;
+  @JoinColumn(name = "userId", columnDefinition = "int default 0")
+  private User assignee;
   private Integer point;
   private Integer est;
 
@@ -34,13 +36,19 @@ public class Task {
     this.status = "In Queue";
   }
 
-//  public User getAssignee() {
+  public Task() {
+  }
+
+  //  public User getAssignee() {
 //    return assignee ? "Undef";
 //  }
+  public void assignToAssignee(User assignee) {
+    this.assignee = assignee;
+  }
 
   @PreUpdate
   @PrePersist
-  public void preUpdate() {
+  public void preUpdateTask() {
     if (this.point == 8) {
       this.est = 10;
     } else {

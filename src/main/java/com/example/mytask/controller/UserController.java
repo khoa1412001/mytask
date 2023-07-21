@@ -19,10 +19,6 @@ public class UserController {
 
   @Autowired
   private IntegrationGateway integrationGateway;
-//  @PostMapping
-//  public void addUser(@RequestBody User user) {
-//
-//  }
 
   @GetMapping("/{id}")
   public DataResponse getUser(@PathVariable int id) {
@@ -36,10 +32,11 @@ public class UserController {
     return integrationGateway.invoke(user, "CREATE_USER");
   }
 
-  @PostMapping("/edit")
-  public DataResponse editUser(@RequestBody UserDTO userDTO) {
+  @PostMapping("/edit/{id}")
+  public DataResponse editUser(@RequestBody UserDTO userDTO, @PathVariable("id") int id) {
     ModelMapper modelMapper = new ModelMapper();
     User user = modelMapper.map(userDTO, User.class);
+    user.setId(id);
     return integrationGateway.invoke(user, "EDIT_USER");
   }
 

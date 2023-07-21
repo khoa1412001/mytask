@@ -1,5 +1,6 @@
 package com.example.mytask.model;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -48,9 +49,13 @@ public class User {
 //    }
 //  }
   @PrePersist
+  public void prePer() {
+    System.out.println("per");
+  }
+
   @PreUpdate
   public void preUp() {
-    System.out.println("both");
+    System.out.println("up");
   }
 
   @Override

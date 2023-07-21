@@ -53,6 +53,7 @@ public class IntegrationConfig {
     router.setChannelMapping("CREATE_USER", "CREATE_USER_CHANNEL");
     router.setChannelMapping("EDIT_USER", "EDIT_USER_CHANNEL");
     //task
+    router.setChannelMapping("CREATE_TASK", "CREATE_TASK_CHANNEL");
     router.setChannelMapping("GET_TASK", "GET_TASK_CHANNEL");
     router.setChannelMapping("EDIT_TASK", "EDIT_TASK_CHANNEL");
     router.setChannelMapping("CALCULATE_DEADLINE", "CALCULATE_DEADLINE_CHANNEL");
@@ -63,7 +64,7 @@ public class IntegrationConfig {
   @ServiceActivator(inputChannel = "LOG_INPUT_CHANNEL")
   public <T> T logInput(T payload) {
     System.out.println("test");
-    System.out.println(payload);
+    System.out.println(String.valueOf(payload));
     return payload;
   }
 }
