@@ -3,6 +3,7 @@ package com.example.mytask.controller;
 import com.example.mytask.model.dto.UserDTO;
 import com.example.mytask.payload.DataResponse;
 import com.example.mytask.config.IntegrationGateway;
+import javax.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,9 +27,11 @@ public class UserController {
   }
 
   @PostMapping("/create")
-  public DataResponse createUser(@RequestBody UserDTO userDTO) {
+  public DataResponse createUser(@Valid @RequestBody UserDTO userDTO) {
     ModelMapper modelMapper = new ModelMapper();
     User user = modelMapper.map(userDTO, User.class);
+    String pno = user.getPhone();
+    user.setPhone(pno.substring(0, 4) + " " + pno.substring(4, 7) + " " + pno.substring(7));
     return integrationGateway.invoke(user, "CREATE_USER");
   }
 

@@ -1,5 +1,6 @@
 package com.example.mytask.config;
 
+import com.example.mytask.payload.DataResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.annotation.Router;
@@ -14,7 +15,9 @@ import org.springframework.integration.dsl.Transformers;
 import org.springframework.integration.router.ExpressionEvaluatingRouter;
 import org.springframework.integration.router.HeaderValueRouter;
 import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.MessagingException;
 import org.springframework.messaging.handler.annotation.Header;
+import org.springframework.messaging.support.ErrorMessage;
 
 @EnableIntegration
 @Configuration
@@ -25,19 +28,13 @@ public class IntegrationConfig {
     return new DirectChannel();
   }
 
-  //  @ServiceActivator(inputChannel = "router.channel")
-//  @Bean
-//  public PayloadTypeRouter router() {
-//    PayloadTypeRouter router = new PayloadTypeRouter();
-//    router.set
-//  }
-//.handle(System.out::println)
   @Bean
   public IntegrationFlow myFlow() {
     return IntegrationFlows.from("INPUT_CHANNEL")
 //        .transform(Transformers.toMap())
 //        .handle(System.out::println).get();
 //        .channel("OUTPUT_CHANNEL").get();
+
         .routeToRecipients(r -> r
             .recipient("LOG_INPUT_CHANNEL")
             .recipient("ROUTING_CHANNEL"))
@@ -58,13 +55,29 @@ public class IntegrationConfig {
     router.setChannelMapping("EDIT_TASK", "EDIT_TASK_CHANNEL");
     router.setChannelMapping("CALCULATE_DEADLINE", "CALCULATE_DEADLINE_CHANNEL");
     router.setChannelMapping("LOG_WORK", "LOG_WORK_CHANNEL");
+    router.setChannelMapping("TEST", "TEST");
     return router;
   }
 
   @ServiceActivator(inputChannel = "LOG_INPUT_CHANNEL")
   public <T> T logInput(T payload) {
-    System.out.println("test");
-    System.out.println(String.valueOf(payload));
+    System.out.println(String.valueOf(payload) + "payload");
     return payload;
+  }
+
+  @ServiceActivator(inputChannel = "ERROR_CHANNEL", outputChannel = "OUTPUT_CHANNEL")
+  public DataResponse errorChannel(MessagingException payload) {
+    System.out.println(getMessage(payload.getMessage()));
+    return new DataResponse("test error");
+  }
+
+  @ServiceActivator(inputChannel = "TEST")
+  public DataResponse test() {
+    throw new RuntimeException("thich thi error");
+//    return new DataResponse("test");
+  }
+
+  private String getMessage(String s) {
+    return s.substring(s.lastIndexOf(":") + 2);
   }
 }

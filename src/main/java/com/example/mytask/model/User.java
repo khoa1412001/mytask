@@ -31,35 +31,27 @@ public class User {
 
   }
 
-  //  @PreUpdate
-//  @PrePersist
-//  public void pre() {
-//    switch (this.role) {
-//      case "Scrum master":
-//        this.role = "Scrum master";
-//        break;
-//      case "Project owner":
-//        this.role = "Project owner";
-//        break;
-//      case "Member":
-//        this.role = "Member";
-//        break;
-//      default:
-//        this.role = "Other";
-//    }
-//  }
-  @PrePersist
-  public void prePer() {
-    System.out.println("per");
-  }
-
   @PreUpdate
-  public void preUp() {
-    System.out.println("up");
+  @PrePersist
+  public void pre() {
+    switch (this.role) {
+      case "Scrum master":
+        this.role = "Scrum master";
+        break;
+      case "Project owner":
+        this.role = "Project owner";
+        break;
+      case "Member":
+        this.role = "Member";
+        break;
+      default:
+        this.role = "Other";
+    }
   }
 
   @Override
   public String toString() {
-    return String.format("%s %s", this.id, this.name);
+    return String.format("Id: %s, name: %s, dob: %s, email: %s, phone: %s, office: %s, role: %s"
+        , getId(), getName(), getDob(), getEmail(), getPhone(), getOffice(), getRole());
   }
 }

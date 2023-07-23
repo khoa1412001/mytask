@@ -1,10 +1,11 @@
 package com.example.mytask.model;
 
-import javax.persistence.Column;
+import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
@@ -25,10 +26,13 @@ public class Task {
   private String title;
   private String status;
   @OneToOne()
-  @JoinColumn(name = "userId", columnDefinition = "int default 0")
+  @JoinColumn(name = "userId")
+  @Getter(AccessLevel.NONE)
   private User assignee;
   private Integer point;
   private Integer est;
+  @OneToMany(mappedBy = "task")
+  private List<Logwork> logwork;
 
   public Task(String title, Integer point) {
     this.title = title;
@@ -39,11 +43,8 @@ public class Task {
   public Task() {
   }
 
-  //  public User getAssignee() {
-//    return assignee ? "Undef";
-//  }
-  public void assignToAssignee(User assignee) {
-    this.assignee = assignee;
+  public String getAssignee() {
+    return this.assignee.getName();
   }
 
   @PreUpdate
@@ -54,5 +55,11 @@ public class Task {
     } else {
       this.est = this.point;
     }
+  }
+
+  @Override
+  public String toString() {
+    return String.format("Id: %s, title: %s, status: %s, assignee: %s, point: %s, est: %s"
+        , getId(), getTitle(), getTitle(), getAssignee(), getPoint(), getEst());
   }
 }
