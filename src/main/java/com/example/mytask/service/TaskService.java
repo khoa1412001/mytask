@@ -5,9 +5,11 @@ import com.example.mytask.model.User;
 import com.example.mytask.payload.DataResponse;
 import com.example.mytask.repository.TaskRepository;
 import com.example.mytask.repository.UserRepository;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.stereotype.Service;
 
@@ -40,14 +42,21 @@ public class TaskService {
   }
 
   @ServiceActivator(inputChannel = "ASSIGN_TASK_CHANNEL", outputChannel = "OUTPUT_CHANNEL")
-  public <T> DataResponse assignTask(List<Integer> payload) {
+  public <T> DataResponse assignTask(Map<String, Integer> payload) {
     System.out.println(payload);
     //payload[0] = userId, payload[1] = taskId
-    User user = userRepository.findById(payload.get(0).intValue());
-    Task task = taskRepository.findById(payload.get(1).intValue());
+    User user = userRepository.findById(payload.get("userId").intValue());
+    Task task = taskRepository.findById(payload.get("taskId").intValue());
     task.setAssignee(user);
+    calculateDeadline(task.getEst());
     taskRepository.save(task);
-    return new DataResponse(
-        String.format("Assigned task to %s successfully")); //,task.getAssignee()));
+    return new DataResponse(200,
+        String.format("Assigned task to %s successfully", task.getAssignee()));
+  }
+
+  private Date calculateDeadline(Integer est) {
+    Integer deadlineHour = LocalDateTime.now().getHour();
+    System.out.println(LocalDateTime.now().plusDays(1));
+    return new Date();
   }
 }

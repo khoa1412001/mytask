@@ -1,8 +1,10 @@
 package com.example.mytask.model;
 
+import java.sql.Date;
 import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
@@ -21,10 +23,10 @@ import lombok.Setter;
 public class Task {
 
   @Id
-  @GeneratedValue
+  @GeneratedValue(strategy = GenerationType.TABLE)
   private Integer id;
   private String title;
-  private String status;
+  private String status = "In queue";
   @OneToOne()
   @JoinColumn(name = "userId")
   @Getter(AccessLevel.NONE)
@@ -33,17 +35,15 @@ public class Task {
   private Integer est;
   @OneToMany(mappedBy = "task")
   private List<Logwork> logwork;
-
-  public Task(String title, Integer point) {
-    this.title = title;
-    this.point = point;
-    this.status = "In Queue";
-  }
+  private Date deadline;
 
   public Task() {
   }
 
   public String getAssignee() {
+    if (this.assignee == null) {
+      return "Undefined";
+    }
     return this.assignee.getName();
   }
 

@@ -3,11 +3,13 @@ package com.example.mytask.model;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,11 +20,12 @@ import lombok.Setter;
 public class User {
 
   @Id
-  @GeneratedValue
+  @GeneratedValue(strategy = GenerationType.TABLE)
   private Integer id;
   private String name;
   private String dob;
   private String email;
+  @Getter(AccessLevel.NONE)
   private String phone;
   private String office;
   private String role;
@@ -34,6 +37,9 @@ public class User {
   @PreUpdate
   @PrePersist
   public void pre() {
+    if (this.role == null) {
+      this.role = "Other";
+    }
     switch (this.role) {
       case "Scrum master":
         this.role = "Scrum master";
@@ -47,6 +53,11 @@ public class User {
       default:
         this.role = "Other";
     }
+  }
+
+  public String getPhone() {
+    String pno = this.phone;
+    return (pno.substring(0, 4) + " " + pno.substring(4, 7) + " " + pno.substring(7));
   }
 
   @Override

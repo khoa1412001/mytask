@@ -7,7 +7,6 @@ public class PhoneValidator implements ConstraintValidator<PhoneValidation, Stri
 
   @Override
   public void initialize(PhoneValidation phoneNumber) {
-    System.out.println(phoneNumber);
   }
 
   @Override

@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("api/v1/Task")
+@RequestMapping("api/v1/task")
 public class TaskController {
 
   @Autowired
@@ -44,7 +44,7 @@ public class TaskController {
   @GetMapping("test")
   public DataResponse test() {
     System.out.println("test controller");
-//    throw new MessagingException("thich");
+//    throw new MessagingException("custome error");
     return integrationGateway.invoke("test", "TEST");
   }
 }

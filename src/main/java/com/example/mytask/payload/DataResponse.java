@@ -24,6 +24,7 @@ public class DataResponse<T> {
   }
 
   public DataResponse(String message) {
+    this.status = 200;
     this.message = message;
   }
 }

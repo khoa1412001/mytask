@@ -9,4 +9,5 @@ public class TaskDTO {
 
   private String title;
   private Integer point;
+  private String status;
 }
