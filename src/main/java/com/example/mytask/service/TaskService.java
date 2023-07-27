@@ -1,15 +1,17 @@
 package com.example.mytask.service;
 
+import static com.example.mytask.constant.ServiceRoutePath.*;
+
 import com.example.mytask.model.Task;
 import com.example.mytask.model.User;
-import com.example.mytask.payload.DataResponse;
 import com.example.mytask.repository.TaskRepository;
 import com.example.mytask.repository.UserRepository;
 import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.stereotype.Service;
 
@@ -22,27 +24,28 @@ public class TaskService {
   private TaskRepository taskRepository;
 
   @ServiceActivator(inputChannel = "CREATE_TASK_CHANNEL", outputChannel = "OUTPUT_CHANNEL")
-  public DataResponse createTask(Task task) {
+  public ResponseEntity createTask(Task task) {
     User user = userRepository.findById(0);
     task.setAssignee(user);
     taskRepository.save(task);
-    return new DataResponse("Created task successfully");
+    return new ResponseEntity("Created task successfully", HttpStatus.OK);
   }
 
   @ServiceActivator(inputChannel = "GET_TASK_CHANNEL", outputChannel = "OUTPUT_CHANNEL")
-  public DataResponse getTask(int id) {
+  public ResponseEntity getTask(int id) {
     Task task = taskRepository.findById(id);
-    return new DataResponse(200, "Got task successfully", task);
+    //"Got task successfully",
+    return new ResponseEntity(task, HttpStatus.OK);
   }
 
   @ServiceActivator(inputChannel = "EDIT_TASK_CHANNEL", outputChannel = "OUTPUT_CHANNEL")
-  public DataResponse editTask(Task task) {
+  public ResponseEntity editTask(Task task) {
     taskRepository.save(task);
-    return new DataResponse("Updated task successfully");
+    return new ResponseEntity("Updated task successfully", HttpStatus.OK);
   }
 
   @ServiceActivator(inputChannel = "ASSIGN_TASK_CHANNEL", outputChannel = "OUTPUT_CHANNEL")
-  public <T> DataResponse assignTask(Map<String, Integer> payload) {
+  public <T> ResponseEntity assignTask(Map<String, Integer> payload) {
     System.out.println(payload);
     //payload[0] = userId, payload[1] = taskId
     User user = userRepository.findById(payload.get("userId").intValue());
@@ -50,8 +53,8 @@ public class TaskService {
     task.setAssignee(user);
     calculateDeadline(task.getEst());
     taskRepository.save(task);
-    return new DataResponse(200,
-        String.format("Assigned task to %s successfully", task.getAssignee()));
+    return new ResponseEntity(String.format("Assigned task to %s successfully", task.getAssignee()),
+        HttpStatus.OK);
   }
 
   private Date calculateDeadline(Integer est) {

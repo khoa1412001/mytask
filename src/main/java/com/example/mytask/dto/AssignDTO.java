@@ -1,4 +1,4 @@
-package com.example.mytask.model.dto;
+package com.example.mytask.dto;
 
 import javax.validation.constraints.NotNull;
 import lombok.Getter;

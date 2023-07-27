@@ -1,5 +1,6 @@
 package com.example.mytask.model;
 
+import com.example.mytask.constant.Role;
 import java.sql.Date;
 import java.util.List;
 import javax.persistence.Entity;
@@ -23,7 +24,7 @@ import lombok.Setter;
 public class Task {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.TABLE)
+  @GeneratedValue(generator = "task_seq")
   private Integer id;
   private String title;
   private String status = "In queue";
@@ -56,6 +57,7 @@ public class Task {
       this.est = this.point;
     }
   }
+
 
   @Override
   public String toString() {

@@ -1,5 +1,7 @@
 package com.example.mytask.model;
 
+import com.example.mytask.constant.Role;
+import java.util.stream.Stream;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -17,10 +19,11 @@ import lombok.Setter;
 @Table(name = "user")
 @Getter
 @Setter
+
 public class User {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.TABLE)
+  @GeneratedValue(generator = "user_seq")
   private Integer id;
   private String name;
   private String dob;
@@ -37,22 +40,18 @@ public class User {
   @PreUpdate
   @PrePersist
   public void pre() {
-    if (this.role == null) {
+    if (!isLegitRole()) {
       this.role = "Other";
     }
-    switch (this.role) {
-      case "Scrum master":
-        this.role = "Scrum master";
-        break;
-      case "Project owner":
-        this.role = "Project owner";
-        break;
-      case "Member":
-        this.role = "Member";
-        break;
-      default:
-        this.role = "Other";
+  }
+
+  private boolean isLegitRole() {
+    for (Role r : Role.values()) {
+      if (r.label.equals(this.role)) {
+        return true;
+      }
     }
+    return false;
   }
 
   public String getPhone() {

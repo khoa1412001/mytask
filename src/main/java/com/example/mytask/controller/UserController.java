@@ -1,11 +1,14 @@
 package com.example.mytask.controller;
 
-import com.example.mytask.model.dto.UserDTO;
-import com.example.mytask.payload.DataResponse;
+import static com.example.mytask.constant.ServiceRoutePath.*;
+
+
+import com.example.mytask.dto.UserDTO;
 import com.example.mytask.config.IntegrationGateway;
 import javax.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,23 +26,23 @@ public class UserController {
   private IntegrationGateway integrationGateway;
 
   @GetMapping("/{id}")
-  public DataResponse getUser(@PathVariable int id) {
-    return integrationGateway.invoke(id, "GET_USER");
+  public ResponseEntity getUser(@PathVariable int id) {
+    return integrationGateway.process(id, GET_USER_CHANNEL);
   }
 
   @PostMapping("/create")
-  public DataResponse createUser(@Valid @RequestBody UserDTO userDTO) {
+  public ResponseEntity createUser(@Valid @RequestBody UserDTO userDTO) {
     ModelMapper modelMapper = new ModelMapper();
     User user = modelMapper.map(userDTO, User.class);
-    return integrationGateway.invoke(user, "CREATE_USER");
+    return integrationGateway.process(user, CREATE_USER_CHANNEL);
   }
 
   @PutMapping("/edit/{id}")
-  public DataResponse editUser(@Valid @RequestBody UserDTO userDTO, @PathVariable("id") int id) {
+  public ResponseEntity editUser(@Valid @RequestBody UserDTO userDTO, @PathVariable("id") int id) {
     ModelMapper modelMapper = new ModelMapper();
     User user = modelMapper.map(userDTO, User.class);
     user.setId(id);
-    return integrationGateway.invoke(user, "EDIT_USER");
+    return integrationGateway.process(user, EDIT_USER_CHANNEL);
   }
 
 }

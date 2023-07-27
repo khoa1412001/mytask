@@ -1,18 +1,22 @@
 package com.example.mytask.config;
 
-import com.example.mytask.payload.DataResponse;
-import java.time.LocalDateTime;
+import static com.example.mytask.constant.RoutePath.*;
+import static com.example.mytask.constant.ServiceRoutePath.*;
+
+import com.example.mytask.constant.ServiceRoutePath;
+import java.lang.reflect.Field;
+import java.util.Map;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.integration.annotation.Router;
 import org.springframework.integration.annotation.ServiceActivator;
-import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.config.EnableIntegration;
-
-
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.dsl.MessageChannels;
+import org.springframework.integration.handler.LoggingHandler.Level;
 import org.springframework.integration.router.HeaderValueRouter;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.MessagingException;
@@ -22,58 +26,48 @@ import org.springframework.messaging.MessagingException;
 @Configuration
 public class IntegrationConfig {
 
-  @Bean
-  public MessageChannel OUTPUT_CHANNEL() {
-//    MessageChannels.direct("LOG").get();
-    return new DirectChannel();
+  @Bean(name = RESULT_CHANNEL)
+  public MessageChannel resultChannel() {
+    return MessageChannels.direct(RESULT_CHANNEL).get();
   }
 
   @Bean
   public IntegrationFlow myFlow() {
-    return IntegrationFlows.from("INPUT_CHANNEL")
-//        .transform(Transformers.toMap())
-//        .handle(System.out::println).get();
-//        .channel("OUTPUT_CHANNEL").get();
-
+    return IntegrationFlows.from(INPUT_CHANNEL)
+        //use handle with log4j
+        .log(Level.INFO, "DATA", m -> m.getPayload())
         .routeToRecipients(r -> r
-            .recipient("LOG_INPUT_CHANNEL")
-            .recipient("ROUTING_CHANNEL"))
+            .recipient(LOG_INPUT_CHANNEL)
+            .recipient(ROUTE_CHANNEL))
         .get();
   }
 
-  @Router(inputChannel = "ROUTING_CHANNEL")
+  @Router(inputChannel = ROUTE_CHANNEL)
   @Bean
   public HeaderValueRouter router() {
     HeaderValueRouter router = new HeaderValueRouter("action");
-    //user
-    router.setChannelMapping("GET_USER", "GET_USER_CHANNEL");
-    router.setChannelMapping("CREATE_USER", "CREATE_USER_CHANNEL");
-    router.setChannelMapping("EDIT_USER", "EDIT_USER_CHANNEL");
-    //task
-    router.setChannelMapping("CREATE_TASK", "CREATE_TASK_CHANNEL");
-    router.setChannelMapping("GET_TASK", "GET_TASK_CHANNEL");
-    router.setChannelMapping("EDIT_TASK", "EDIT_TASK_CHANNEL");
-    router.setChannelMapping("ASSIGN_TASK", "ASSIGN_TASK_CHANNEL");
-    router.setChannelMapping("CALCULATE_DEADLINE", "CALCULATE_DEADLINE_CHANNEL");
-    router.setChannelMapping("LOG_WORK", "LOG_WORK_CHANNEL");
-    router.setChannelMapping("TEST", "TEST");
+    for (Field f : ServiceRoutePath.class.getDeclaredFields()) {
+      String channelName = f.getName();
+      router.setChannelMapping(channelName, channelName);
+    }
     return router;
   }
 
-  @ServiceActivator(inputChannel = "LOG_INPUT_CHANNEL")
+  @ServiceActivator(inputChannel = LOG_INPUT_CHANNEL)
   public <T> void logInput(T payload) {
     System.out.println("payload: " + String.valueOf(payload));
   }
 
-  @ServiceActivator(inputChannel = "ERROR_CHANNEL", outputChannel = "OUTPUT_CHANNEL")
-  public DataResponse errorChannel(MessagingException payload) {
-    payload.printStackTrace();
-    System.out.println(payload.getMessage());
-    return new DataResponse("test error");
+  @ServiceActivator(inputChannel = ERROR_CHANNEL, outputChannel = RESULT_CHANNEL)
+  public ResponseEntity errorChannel(MessagingException payload) {
+//    payload.printStackTrace();
+    System.out.println(payload.getFailedMessage().toString());
+    System.out.println(payload.getFailedMessage().getPayload());
+    return new ResponseEntity("TEST Response", HttpStatus.BAD_REQUEST);
   }
 
-  @ServiceActivator(inputChannel = "TEST")
-  public DataResponse test() {
+  @ServiceActivator(inputChannel = TEST_CHANNEL)
+  public ResponseEntity test() {
 //    System.out.println(LocalDateTime.now().getHour());
     throw new RuntimeException("New Error");
 //    return new DataResponse("test");

@@ -1,4 +1,4 @@
-package com.example.mytask.model.dto;
+package com.example.mytask.dto;
 
 import com.example.mytask.validation.dob.DobValidation;
 import com.example.mytask.validation.email.EmailValidation;

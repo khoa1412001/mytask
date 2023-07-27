@@ -1,17 +1,23 @@
 package com.example.mytask.controller;
 
+import static com.example.mytask.constant.ServiceRoutePath.*;
+
 import com.example.mytask.config.IntegrationGateway;
+import com.example.mytask.dto.TaskUpdateDTO;
 import com.example.mytask.model.Task;
-import com.example.mytask.model.dto.TaskDTO;
-import com.example.mytask.payload.DataResponse;
+import com.example.mytask.dto.TaskDTO;
+import java.util.HashMap;
+import java.util.Map;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -22,29 +28,48 @@ public class TaskController {
   private IntegrationGateway integrationGateway;
 
   @GetMapping("/{id}")
-  public DataResponse getTask(@PathVariable("id") Integer id) {
-    return integrationGateway.invoke(id, "GET_TASK_CHANNEL");
+  public ResponseEntity getTask(@PathVariable("id") Integer id) {
+    return integrationGateway.process(id, GET_TASK_CHANNEL);
   }
 
-  @PostMapping("/edit/{id}")
-  public DataResponse editTask(@RequestBody TaskDTO taskDTO, @PathVariable("id") int id) {
+  @PutMapping("/{id}")
+  public ResponseEntity editTask(@RequestBody TaskUpdateDTO taskUpdateDTO, @PathVariable("id") int id) {
     ModelMapper modelMapper = new ModelMapper();
-    Task task = modelMapper.map(taskDTO, Task.class);
+    Task task = modelMapper.map(taskUpdateDTO, Task.class);
     task.setId(id);
-    return integrationGateway.invoke(task, "EDIT_TASK");
+    return integrationGateway.process(task, EDIT_TASK_CHANNEL);
   }
 
-  @PostMapping("create")
-  public DataResponse createTask(@RequestBody TaskDTO taskDTO) {
+  @PostMapping()
+  public ResponseEntity createTask(@RequestBody TaskDTO taskDTO) {
     ModelMapper modelMapper = new ModelMapper();
     Task task = modelMapper.map(taskDTO, Task.class);
-    return integrationGateway.invoke(task, "CREATE_TASK");
+    return integrationGateway.process(task, CREATE_TASK_CHANNEL);
+  }
+
+  @PostMapping("/logwork")
+  public ResponseEntity addLogwork(@RequestBody ){}
+
+  @PostMapping("/{taskId}/user/{userId}")
+  public ResponseEntity assignTaskToUser(@PathVariable("taskId") int taskId, @PathVariable("userId") int userId) {
+    Map<String,Integer> map = new HashMap<>();
+    map.put("userId", userId);
+    map.put("taskId", taskId);
+    return integrationGateway.process(map, ASSIGN_TASK_CHANNEL);
   }
 
   @GetMapping("test")
-  public DataResponse test() {
-    System.out.println("test controller");
-//    throw new MessagingException("custome error");
-    return integrationGateway.invoke("test", "TEST");
+  public ResponseEntity test(@RequestParam("role") String role) {
+//    throw new RuntimeException("custome error");
+//    Task task;
+//    task.new = "hello";
+    System.out.println();
+    //    for (Role r :Role.values()) {
+//      r.label.equals(role) {
+//        return true
+//      }
+//    }
+//    return integrationGateway.invoke("test payload", TEST_CHANNEL);
+    return ResponseEntity.ok("a");
   }
 }

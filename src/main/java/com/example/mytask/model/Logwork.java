@@ -18,7 +18,7 @@ import lombok.Setter;
 public class Logwork {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.TABLE)
+  @GeneratedValue(generator = "logwork_seq")
   private Integer id;
   private Date timeStart;
   private Date timeEnd;
