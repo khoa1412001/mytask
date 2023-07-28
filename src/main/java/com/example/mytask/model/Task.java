@@ -1,11 +1,9 @@
 package com.example.mytask.model;
 
-import com.example.mytask.constant.Role;
 import java.sql.Date;
 import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
@@ -37,6 +35,7 @@ public class Task {
   @OneToMany(mappedBy = "task")
   private List<Logwork> logwork;
   private Date deadline;
+  private String remaining;
 
   public Task() {
   }

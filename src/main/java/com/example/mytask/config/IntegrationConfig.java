@@ -6,6 +6,8 @@ import static com.example.mytask.constant.ServiceRoutePath.*;
 import com.example.mytask.constant.ServiceRoutePath;
 import java.lang.reflect.Field;
 import java.util.Map;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
@@ -25,6 +27,9 @@ import org.springframework.messaging.MessagingException;
 @EnableIntegration
 @Configuration
 public class IntegrationConfig {
+
+  //  private static final Logger logger = LogManager.getLogger(Log4j2DemoApplication.class);
+  private static final Logger logger = LogManager.getLogger("INPUT");
 
   @Bean(name = RESULT_CHANNEL)
   public MessageChannel resultChannel() {
@@ -55,12 +60,12 @@ public class IntegrationConfig {
 
   @ServiceActivator(inputChannel = LOG_INPUT_CHANNEL)
   public <T> void logInput(T payload) {
-    System.out.println("payload: " + String.valueOf(payload));
+    logger.info(payload);
   }
 
   @ServiceActivator(inputChannel = ERROR_CHANNEL, outputChannel = RESULT_CHANNEL)
   public ResponseEntity errorChannel(MessagingException payload) {
-//    payload.printStackTrace();
+    payload.printStackTrace();
     System.out.println(payload.getFailedMessage().toString());
     System.out.println(payload.getFailedMessage().getPayload());
     return new ResponseEntity("TEST Response", HttpStatus.BAD_REQUEST);

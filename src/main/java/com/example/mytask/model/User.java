@@ -1,6 +1,7 @@
 package com.example.mytask.model;
 
 import com.example.mytask.constant.Role;
+import java.util.List;
 import java.util.stream.Stream;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -43,6 +44,16 @@ public class User {
     if (!isLegitRole()) {
       this.role = "Other";
     }
+    String[] temp = this.dob.split("/");
+    String finalDob = "";
+    for (String s : temp) {
+      if (s.length() < 2) {
+        finalDob = finalDob.concat("0" + s);
+      } else {
+        finalDob = finalDob.concat(s);
+      }
+    }
+    this.dob = finalDob;
   }
 
   private boolean isLegitRole() {
@@ -55,6 +66,9 @@ public class User {
   }
 
   public String getPhone() {
+    if (this.phone == null) {
+      return "";
+    }
     String pno = this.phone;
     return (pno.substring(0, 4) + " " + pno.substring(4, 7) + " " + pno.substring(7));
   }
