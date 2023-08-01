@@ -32,18 +32,18 @@ public class IntegrationConfig {
   private static final Logger logger = LogManager.getLogger("INPUT");
 
   @Bean(name = RESULT_CHANNEL)
-  public MessageChannel resultChannel() {
+  public DirectChannel resultChannel() {
     return MessageChannels.direct(RESULT_CHANNEL).get();
   }
 
+  @Resource
+  private HandleLogRequest handleLogRequest;
+
   @Bean
   public IntegrationFlow myFlow() {
-    return IntegrationFlows.from(INPUT_CHANNEL)
-        //use handle with log4j
-        .log(Level.INFO, "DATA", m -> m.getPayload())
-        .routeToRecipients(r -> r
-            .recipient(LOG_INPUT_CHANNEL)
-            .recipient(ROUTE_CHANNEL))
+    return IntegrationFlows.from(inputChannel())
+        .handle(new ServiceActivatingHandler(handleLogRequest))
+        .channel(ROUTE_CHANNEL)
         .get();
   }
 
