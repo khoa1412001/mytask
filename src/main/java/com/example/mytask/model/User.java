@@ -13,13 +13,20 @@ import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
 @Table(name = "user")
 @Getter
 @Setter
+@AllArgsConstructor(access = AccessLevel.PACKAGE)
+@NoArgsConstructor(access = AccessLevel.PACKAGE)
+@Builder(toBuilder = true)
 
 public class User {
 
@@ -33,10 +40,6 @@ public class User {
   private String phone;
   private String office;
   private String role;
-
-  public User() {
-
-  }
 
   @PreUpdate
   @PrePersist

@@ -2,9 +2,9 @@ package com.example.mytask.controller;
 
 import static com.example.mytask.constant.ServiceRoutePath.*;
 
-
-import com.example.mytask.dto.UserDTO;
 import com.example.mytask.config.IntegrationGateway;
+import com.example.mytask.dto.UserDTO;
+import com.example.mytask.model.User;
 import javax.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.example.mytask.model.User;
 
 @RestController
 @RequestMapping("api/v1/user")
@@ -27,6 +26,7 @@ public class UserController {
 
   @GetMapping("/{id}")
   public ResponseEntity getUser(@PathVariable int id) {
+//    return new ResponseEntity(userRepository.findById(id), HttpStatus.OK);
     return integrationGateway.process(id, GET_USER_CHANNEL);
   }
 
