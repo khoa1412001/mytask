@@ -10,7 +10,6 @@ public class ServiceRoutePath {
   public static final String EDIT_TASK_CHANNEL = "edit.task.channel";
   public static final String GET_TASK_CHANNEL = "edit.task.channel";
   public static final String ASSIGN_TASK_CHANNEL = "assign.task.channel";
-  //    router.setChannelMapping("CALCULATE_DEADLINE", "CALCULATE_DEADLINE_CHANNEL");
   public static final String LOG_WORK_CHANNEL = "log.work.channel";
   public static final String GET_TASKS_CHANNEL = "get.tasks.channel";
 
