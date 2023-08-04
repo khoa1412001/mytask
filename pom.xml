@@ -49,7 +49,6 @@
     <dependency>
       <groupId>org.springframework.integration</groupId>
       <artifactId>spring-integration-core</artifactId>
-      <version>5.5.15</version>
     </dependency>
     <!--    spring data jpa-->
     <dependency>
@@ -60,7 +59,6 @@
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
-      <version>1.18.24</version>
       <scope>provided</scope>
     </dependency>
     <!--    mysql-->
@@ -84,29 +82,30 @@
     <!--    junit 5-->
     <dependency>
       <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter-engine</artifactId>
-      <version>5.9.3</version>
+      <artifactId>junit-jupiter</artifactId>
       <scope>test</scope>
     </dependency>
     <!--    mockito core-->
     <dependency>
       <groupId>org.mockito</groupId>
-      <artifactId>mockito-core</artifactId>
-      <version>5.3.1</version>
+      <artifactId>mockito-inline</artifactId>
       <scope>test</scope>
     </dependency>
     <!--    -->
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-junit-jupiter</artifactId>
-      <version>5.3.1</version>
       <scope>test</scope>
     </dependency>
     <!--    object mapper-->
     <dependency>
       <groupId>com.fasterxml.jackson.dataformat</groupId>
       <artifactId>jackson-dataformat-xml</artifactId>
-      <version>2.14.2</version>
+    </dependency>
+    <!--    spring integration test-->
+    <dependency>
+      <groupId>org.springframework.integration</groupId>
+      <artifactId>spring-integration-test-support</artifactId>
     </dependency>
 
 
@@ -121,12 +120,10 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.22.0</version>
       </plugin>
       <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
-        <version>0.8.10</version>
         <executions>
           <execution>
             <goals>

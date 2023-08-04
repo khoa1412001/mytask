@@ -3,82 +3,145 @@ package com.example.mytask.config;
 import static com.example.mytask.constant.RoutePath.*;
 import static com.example.mytask.constant.ServiceRoutePath.*;
 
-import com.example.mytask.constant.ServiceRoutePath;
-import java.lang.reflect.Field;
+import com.example.mytask.model.Logwork;
+import com.example.mytask.model.Task;
+import com.example.mytask.model.User;
+import com.example.mytask.service.TaskService;
+import com.example.mytask.service.UserService;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.integration.annotation.Router;
 import org.springframework.integration.annotation.ServiceActivator;
+import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.config.EnableIntegration;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.dsl.MessageChannels;
-import org.springframework.integration.handler.LoggingHandler.Level;
+import org.springframework.integration.handler.ServiceActivatingHandler;
 import org.springframework.integration.router.HeaderValueRouter;
-import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.MessageHandlingException;
 import org.springframework.messaging.MessagingException;
-
+import org.springframework.messaging.handler.annotation.Header;
 
 @EnableIntegration
 @Configuration
 public class IntegrationConfig {
 
-  //  private static final Logger logger = LogManager.getLogger(Log4j2DemoApplication.class);
-  private static final Logger logger = LogManager.getLogger("INPUT");
+  private static Logger logger = LogManager.getLogger();
+  @Autowired
+  private HandleLogRequest handleLogRequest;
+  @Autowired
+  private UserService userService;
+
+  @Autowired
+  private TaskService taskService;
 
   @Bean(name = RESULT_CHANNEL)
-  public MessageChannel resultChannel() {
+  public DirectChannel resultChannel() {
     return MessageChannels.direct(RESULT_CHANNEL).get();
+  }
+
+  @Bean(name = INPUT_CHANNEL)
+  public DirectChannel inputChannel() {
+    return MessageChannels.direct(INPUT_CHANNEL).get();
+  }
+
+  @Bean(name = ROUTE_CHANNEL)
+  public DirectChannel routerChannel() {
+    return MessageChannels.direct(ROUTE_CHANNEL).get();
   }
 
   @Bean
   public IntegrationFlow myFlow() {
-    return IntegrationFlows.from(INPUT_CHANNEL)
-        //use handle with log4j
-        .log(Level.INFO, "DATA", m -> m.getPayload())
-        .routeToRecipients(r -> r
-            .recipient(LOG_INPUT_CHANNEL)
-            .recipient(ROUTE_CHANNEL))
-        .get();
+    return IntegrationFlows.from(inputChannel())
+        .handle(new ServiceActivatingHandler(handleLogRequest))
+        .route(router()).get();
   }
 
-  @Router(inputChannel = ROUTE_CHANNEL)
-  @Bean
   public HeaderValueRouter router() {
     HeaderValueRouter router = new HeaderValueRouter("action");
-    for (Field f : ServiceRoutePath.class.getDeclaredFields()) {
-      String channelName = f.getName();
-      router.setChannelMapping(channelName, channelName);
-    }
     return router;
   }
 
-  @ServiceActivator(inputChannel = LOG_INPUT_CHANNEL)
-  public <T> void logInput(T payload) {
-    logger.info(payload);
-  }
-
-  @ServiceActivator(inputChannel = ERROR_CHANNEL, outputChannel = RESULT_CHANNEL)
-  public ResponseEntity errorChannel(MessagingException payload) {
+  @ServiceActivator(inputChannel = ERROR_CHANNEL)
+//  MessageHandlingException
+  public ResponseEntity errorChannel(Exception payload) {
     payload.printStackTrace();
-    System.out.println(payload.getFailedMessage().toString());
-    System.out.println(payload.getFailedMessage().getPayload());
-    return new ResponseEntity("TEST Response", HttpStatus.BAD_REQUEST);
+    logger.error(payload.getMessage());
+    return new ResponseEntity(
+        "An error occurred, please try again later", HttpStatus.BAD_REQUEST);
   }
 
-  @ServiceActivator(inputChannel = TEST_CHANNEL)
-  public ResponseEntity test() {
-//    System.out.println(LocalDateTime.now().getHour());
-    throw new RuntimeException("New Error");
-//    return new DataResponse("test");
+  @ServiceActivator(inputChannel = GET_USERS_CHANNEL)
+  public ResponseEntity getUsers() {
+    return ResponseEntity.ok(userService.getUsers());
   }
 
-  private String getMessage(String s) {
-    return s.substring(s.lastIndexOf(":") + 2);
+  @ServiceActivator(inputChannel = GET_USER_CHANNEL)
+  public ResponseEntity getUser(Integer userId) {
+    Optional<User> user = userService.getUser(userId);
+    return user.isEmpty() ?
+        ResponseEntity.ok("User not found") :
+        ResponseEntity.ok(user.get());
+  }
+
+  @ServiceActivator(inputChannel = CREATE_USER_CHANNEL)
+  public ResponseEntity createUser(User user) {
+    String result = userService.createUser(user);
+    return ResponseEntity.ok(result);
+  }
+
+  @ServiceActivator(inputChannel = EDIT_USER_CHANNEL)
+  public ResponseEntity editUser(User user) {
+    String result = userService.editUser(user);
+    return ResponseEntity.ok(result);
+  }
+
+  @ServiceActivator(inputChannel = GET_TASKS_CHANNEL)
+  public ResponseEntity getTasks() {
+    return ResponseEntity.ok(taskService.getTasks());
+  }
+
+  @ServiceActivator(inputChannel = GET_TASK_CHANNEL)
+  public ResponseEntity getTask(Integer taskId) {
+    Optional<Task> task = taskService.getTask(taskId);
+    return ResponseEntity.ok(task.isEmpty() ? "Task not found" : task.get());
+  }
+
+  @ServiceActivator(inputChannel = CREATE_TASK_CHANNEL)
+  public ResponseEntity createTask(Task task) {
+    return ResponseEntity.ok(taskService.createTask(task));
+  }
+
+
+  @ServiceActivator(inputChannel = EDIT_TASK_CHANNEL)
+  public ResponseEntity editTask(Task task) {
+    String result = taskService.editTask(task);
+    return ResponseEntity.ok(result);
+  }
+
+  @ServiceActivator(inputChannel = ASSIGN_TASK_CHANNEL)
+  public ResponseEntity assignTask(Map<String, Integer> map) {
+    String result = taskService.assignTask(map.get("userId"), map.get("taskId"));
+    return ResponseEntity.ok(result);
+  }
+
+  @ServiceActivator(inputChannel = LOG_WORK_CHANNEL)
+  public ResponseEntity addLogwork(Map<String, String> map) {
+    String result = taskService.addLogwork(
+        Timestamp.from(Instant.ofEpochMilli(Long.valueOf(map.get("timeBegin")))),
+        Timestamp.from(Instant.ofEpochMilli(Long.valueOf(map.get("timeEnd")))),
+        Integer.valueOf(map.get("taskId")));
+    return ResponseEntity.ok(result);
   }
 }

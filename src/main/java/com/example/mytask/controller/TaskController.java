@@ -6,13 +6,14 @@ import com.example.mytask.config.IntegrationGateway;
 import com.example.mytask.dto.TaskUpdateDTO;
 import com.example.mytask.model.Task;
 import com.example.mytask.dto.TaskDTO;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import com.example.mytask.validation.timestamp.DateValidation;
 import java.util.HashMap;
 import java.util.Map;
+import javax.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("api/v1/task")
+@Validated
 public class TaskController {
 
   @Autowired
@@ -52,8 +54,8 @@ public class TaskController {
 
   @PostMapping("/{id}/logwork")
   public ResponseEntity addLogwork(
-      @RequestParam("timeBegin") String timeBegin,
-      @RequestParam("timeEnd") String timeEnd,
+      @RequestParam("timeBegin") @DateValidation String timeBegin,
+      @RequestParam("timeEnd") @DateValidation String timeEnd,
       @PathVariable("id") Integer taskId) {
     Map<String, String> map = new HashMap<>();
     map.put("timeBegin", timeBegin);
@@ -69,16 +71,5 @@ public class TaskController {
     map.put("userId", userId);
     map.put("taskId", taskId);
     return integrationGateway.process(map, ASSIGN_TASK_CHANNEL);
-  }
-
-  @GetMapping("test")
-  public ResponseEntity test(@RequestParam("est") int est) {
-    Integer deadlineHour = LocalDateTime.now().getHour();
-    if (deadlineHour + est >= 17) {
-      System.out.println(LocalDate.now().plusDays(1));
-      return ResponseEntity.ok("a");
-    }
-    System.out.println(LocalDate.now());
-    return ResponseEntity.ok("a");
   }
 }

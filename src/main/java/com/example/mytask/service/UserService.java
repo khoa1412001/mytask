@@ -1,37 +1,17 @@
 package com.example.mytask.service;
 
-import static com.example.mytask.constant.RoutePath.*;
-import static com.example.mytask.constant.ServiceRoutePath.*;
-
 import com.example.mytask.model.User;
-import com.example.mytask.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.http.ResponseEntity;
-import org.springframework.integration.annotation.ServiceActivator;
-import org.springframework.stereotype.Service;
 
-@Service
-public class UserService {
+public interface UserService {
 
-  @Autowired
-  private UserRepository userRepository;
+  List<User> getUsers();
 
-  @ServiceActivator(inputChannel = GET_USER_CHANNEL, outputChannel = RESULT_CHANNEL)
-  public ResponseEntity getUser(int id) {
-    User user = userRepository.findById(id);
-    return new ResponseEntity(user, HttpStatus.OK);
-  }
+  Optional<User> getUser(Integer id);
 
-  @ServiceActivator(inputChannel = CREATE_USER_CHANNEL, outputChannel = RESULT_CHANNEL)
-  public ResponseEntity createUser(User user) {
-    userRepository.save(user);
-    return new ResponseEntity<String>("Saved user successfully", HttpStatus.OK);
-  }
+  String createUser(User user);
 
-  @ServiceActivator(inputChannel = EDIT_USER_CHANNEL, outputChannel = RESULT_CHANNEL)
-  public ResponseEntity editUser(User user) {
-    userRepository.save(user);
-    return new ResponseEntity("Updated user successfully", HttpStatus.OK);
-  }
+  String editUser(User user);
 }

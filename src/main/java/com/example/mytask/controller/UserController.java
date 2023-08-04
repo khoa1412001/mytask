@@ -24,20 +24,24 @@ public class UserController {
   @Autowired
   private IntegrationGateway integrationGateway;
 
+  @GetMapping
+  public ResponseEntity getUsers() {
+    return integrationGateway.process(GET_USERS_CHANNEL);
+  }
+
   @GetMapping("/{id}")
-  public ResponseEntity getUser(@PathVariable int id) {
-//    return new ResponseEntity(userRepository.findById(id), HttpStatus.OK);
+  public ResponseEntity getUser(@PathVariable Integer id) {
     return integrationGateway.process(id, GET_USER_CHANNEL);
   }
 
-  @PostMapping("/create")
+  @PostMapping()
   public ResponseEntity createUser(@Valid @RequestBody UserDTO userDTO) {
     ModelMapper modelMapper = new ModelMapper();
     User user = modelMapper.map(userDTO, User.class);
     return integrationGateway.process(user, CREATE_USER_CHANNEL);
   }
 
-  @PutMapping("/edit/{id}")
+  @PutMapping("/{id}")
   public ResponseEntity editUser(@Valid @RequestBody UserDTO userDTO, @PathVariable("id") int id) {
     ModelMapper modelMapper = new ModelMapper();
     User user = modelMapper.map(userDTO, User.class);

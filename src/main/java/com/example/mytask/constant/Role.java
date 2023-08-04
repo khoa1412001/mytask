@@ -1,16 +1,13 @@
 package com.example.mytask.constant;
 
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 public enum Role {
   SM("Scrum master"),
   PO("Project owner"),
-  Member("Member"),
-  Other("Other");
+  MEMBER("Member"),
+  OTHER("Other");
 
   public final String label;
-
-  private Role(String label) {
-    this.label = label;
-  }
-
 }

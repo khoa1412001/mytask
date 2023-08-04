@@ -1,14 +1,14 @@
 package com.example.mytask.constant;
 
-public enum TaskStatus {
-  In_Queue("In Queue"),
-  Need_Review("Need Review"),
-  Pending("Pending"),
-  In_Progress("In_Progress"),
-  Done("Done");
-  private final String status;
+import lombok.RequiredArgsConstructor;
 
-  private TaskStatus(String status) {
-    this.status = status;
-  }
+@RequiredArgsConstructor
+public enum TaskStatus {
+  IN_QUEUE("In Queue"),
+  NEED_REVIEW("Need Review"),
+  PENDING("Pending"),
+  IN_PROGRESS("In_Progress"),
+  DONE("Done");
+
+  private final String status;
 }

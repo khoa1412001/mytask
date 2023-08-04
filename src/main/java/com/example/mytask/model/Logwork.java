@@ -11,12 +11,14 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
 @Table(name = "logwork")
 @Getter
 @Setter
+@NoArgsConstructor
 public class Logwork {
 
   @Id
@@ -28,4 +30,9 @@ public class Logwork {
   @JsonBackReference
   @JoinColumn(name = "taskId")
   private Task task;
+
+  public Logwork(Timestamp timeStart, Timestamp timeEnd) {
+    this.timeStart = timeStart;
+    this.timeEnd = timeEnd;
+  }
 }

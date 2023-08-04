@@ -14,4 +14,7 @@ public interface IntegrationGateway {
   @Gateway(requestChannel = INPUT_CHANNEL, replyChannel = RESULT_CHANNEL)
   <T> ResponseEntity<?> process(@Payload T payload, @Header("action") String action);
 
+  @Gateway(requestChannel = INPUT_CHANNEL, replyChannel = RESULT_CHANNEL, payloadExpression = "''")
+  ResponseEntity<?> process(@Header("action") String action);
+
 }

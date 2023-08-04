@@ -24,7 +24,7 @@ import lombok.Setter;
 @Table(name = "user")
 @Getter
 @Setter
-@AllArgsConstructor(access = AccessLevel.PACKAGE)
+@AllArgsConstructor()
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
 @Builder(toBuilder = true)
 

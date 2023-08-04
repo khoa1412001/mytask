@@ -1,5 +1,7 @@
 package com.example.mytask.model;
 
+import static com.example.mytask.constant.CONSTANT.UNDEFINED;
+
 import java.sql.Date;
 import java.util.List;
 import javax.persistence.Entity;
@@ -42,7 +44,7 @@ public class Task {
 
   public String getAssignee() {
     if (this.assignee == null) {
-      return "Undefined";
+      return UNDEFINED;
     }
     return this.assignee.getName();
   }
