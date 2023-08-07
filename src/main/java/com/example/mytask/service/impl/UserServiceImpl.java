@@ -1,10 +1,10 @@
-package com.example.mytask.service.serviceImpl;
+package com.example.mytask.service.impl;
 
+import com.example.mytask.exceptions.UserNotFoundException;
 import com.example.mytask.model.User;
 import com.example.mytask.repository.UserRepository;
 import com.example.mytask.service.UserService;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,19 +21,21 @@ public class UserServiceImpl implements UserService {
     return userList;
   }
 
-  public Optional<User> getUser(Integer id) {
-    return userRepository.findById(id);
+  public User getUser(int id) {
+    return userRepository.findById(id)
+        .orElseThrow(() -> new UserNotFoundException("User could not be found"));
   }
 
   @Override
-  public String createUser(User user) {
-    userRepository.save(user);
-    return "Saved user successfully";
+  public User createUser(User user) {
+    return userRepository.save(user);
   }
 
   @Override
-  public String editUser(User user) {
-    userRepository.save(user);
-    return "Updated user successfully";
+  public User editUser(User updateUser) {
+    if (!userRepository.existsById(updateUser.getId())) {
+      throw new UserNotFoundException("User could not be found");
+    }
+    return userRepository.save(updateUser);
   }
 }

@@ -2,6 +2,9 @@ package com.example.mytask.constant;
 
 public class RoutePath {
 
+  private RoutePath() {
+  }
+
   public static final String ROUTE_CHANNEL = "route.channel";
   public static final String RESULT_CHANNEL = "result.channel";
   public static final String ERROR_CHANNEL = "error.channel";

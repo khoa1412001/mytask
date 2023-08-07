@@ -9,7 +9,6 @@ import com.example.mytask.dto.TaskDTO;
 import com.example.mytask.validation.timestamp.DateValidation;
 import java.util.HashMap;
 import java.util.Map;
-import javax.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -32,12 +31,12 @@ public class TaskController {
   private IntegrationGateway integrationGateway;
 
   @GetMapping("/{id}")
-  public ResponseEntity getTask(@PathVariable("id") Integer id) {
+  public ResponseEntity<Object> getTask(@PathVariable("id") int id) {
     return integrationGateway.process(id, GET_TASK_CHANNEL);
   }
 
   @PutMapping("/{id}")
-  public ResponseEntity editTask(@RequestBody TaskUpdateDTO taskUpdateDTO,
+  public ResponseEntity<Object> editTask(@RequestBody TaskUpdateDTO taskUpdateDTO,
       @PathVariable("id") int id) {
     ModelMapper modelMapper = new ModelMapper();
     Task task = modelMapper.map(taskUpdateDTO, Task.class);
@@ -46,17 +45,17 @@ public class TaskController {
   }
 
   @PostMapping()
-  public ResponseEntity createTask(@RequestBody TaskDTO taskDTO) {
+  public ResponseEntity<Object> createTask(@RequestBody TaskDTO taskDTO) {
     ModelMapper modelMapper = new ModelMapper();
     Task task = modelMapper.map(taskDTO, Task.class);
     return integrationGateway.process(task, CREATE_TASK_CHANNEL);
   }
 
   @PostMapping("/{id}/logwork")
-  public ResponseEntity addLogwork(
+  public ResponseEntity<Object> addLogwork(
       @RequestParam("timeBegin") @DateValidation String timeBegin,
       @RequestParam("timeEnd") @DateValidation String timeEnd,
-      @PathVariable("id") Integer taskId) {
+      @PathVariable("id") int taskId) {
     Map<String, String> map = new HashMap<>();
     map.put("timeBegin", timeBegin);
     map.put("timeEnd", timeEnd);
@@ -65,7 +64,7 @@ public class TaskController {
   }
 
   @PostMapping("/{taskId}/user/{userId}")
-  public ResponseEntity assignTaskToUser(@PathVariable("taskId") int taskId,
+  public ResponseEntity<Object> assignTaskToUser(@PathVariable("taskId") int taskId,
       @PathVariable("userId") int userId) {
     Map<String, Integer> map = new HashMap<>();
     map.put("userId", userId);

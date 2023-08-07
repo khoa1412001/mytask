@@ -1,6 +1,5 @@
 package com.example.mytask.validation.dob;
 
-import com.example.mytask.validation.phone.PhoneValidator;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

@@ -14,6 +14,8 @@ import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -21,6 +23,8 @@ import lombok.Setter;
 @Table(name = "task")
 @Getter
 @Setter
+@Builder(toBuilder = true)
+@AllArgsConstructor
 public class Task {
 
   @Id
@@ -39,8 +43,6 @@ public class Task {
   private Date deadline;
   private String remaining;
 
-  public Task() {
-  }
 
   public String getAssignee() {
     if (this.assignee == null) {

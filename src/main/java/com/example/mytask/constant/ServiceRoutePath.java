@@ -2,6 +2,9 @@ package com.example.mytask.constant;
 
 public class ServiceRoutePath {
 
+  private ServiceRoutePath() {
+  }
+
   public static final String GET_USERS_CHANNEL = "get.users.channel";
   public static final String GET_USER_CHANNEL = "get.user.channel";
   public static final String CREATE_USER_CHANNEL = "create.user.channel";

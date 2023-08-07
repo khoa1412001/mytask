@@ -5,13 +5,10 @@ import javax.validation.ConstraintValidatorContext;
 
 public class PhoneValidator implements ConstraintValidator<PhoneValidation, String> {
 
-  @Override
-  public void initialize(PhoneValidation phoneNumber) {
-  }
 
   @Override
   public boolean isValid(String s, ConstraintValidatorContext constraintValidatorContext) {
-    return s != null && s.matches("[0-9]+")
+    return s != null && s.matches("\\d+")
         && (s.length() == 10);
   }
 }

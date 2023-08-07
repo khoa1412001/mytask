@@ -25,24 +25,25 @@ public class UserController {
   private IntegrationGateway integrationGateway;
 
   @GetMapping
-  public ResponseEntity getUsers() {
+  public ResponseEntity<Object> getUsers() {
     return integrationGateway.process(GET_USERS_CHANNEL);
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity getUser(@PathVariable Integer id) {
+  public ResponseEntity<Object> getUser(@PathVariable int id) {
     return integrationGateway.process(id, GET_USER_CHANNEL);
   }
 
   @PostMapping()
-  public ResponseEntity createUser(@Valid @RequestBody UserDTO userDTO) {
+  public ResponseEntity<Object> createUser(@Valid @RequestBody UserDTO userDTO) {
     ModelMapper modelMapper = new ModelMapper();
     User user = modelMapper.map(userDTO, User.class);
     return integrationGateway.process(user, CREATE_USER_CHANNEL);
   }
 
   @PutMapping("/{id}")
-  public ResponseEntity editUser(@Valid @RequestBody UserDTO userDTO, @PathVariable("id") int id) {
+  public ResponseEntity<Object> editUser(@Valid @RequestBody UserDTO userDTO,
+      @PathVariable("id") int id) {
     ModelMapper modelMapper = new ModelMapper();
     User user = modelMapper.map(userDTO, User.class);
     user.setId(id);

@@ -1,13 +1,10 @@
-package com.example.mytask.exception;
+package com.example.mytask.exceptions;
 
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -21,9 +18,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 @RestControllerAdvice
-public class CustomExceptionHandle extends ResponseEntityExceptionHandler {
-
-  private final Logger logger = LogManager.getLogger();
+public class GlobalExceptionHandle extends ResponseEntityExceptionHandler {
 
   @Override
   protected ResponseEntity<Object> handleMethodArgumentNotValid(
@@ -31,7 +26,7 @@ public class CustomExceptionHandle extends ResponseEntityExceptionHandler {
       HttpHeaders headers,
       HttpStatus status,
       WebRequest request) {
-    List<String> errors = new ArrayList<String>();
+    List<String> errors = new ArrayList<>();
     for (FieldError error : ex.getBindingResult().getFieldErrors()) {
       errors.add(error.getField() + ": " + error.getDefaultMessage());
     }
@@ -56,7 +51,7 @@ public class CustomExceptionHandle extends ResponseEntityExceptionHandler {
   @ExceptionHandler(ConstraintViolationException.class)
   public ResponseEntity<Object> handleConstraintViolationException(
       ConstraintViolationException ex) {
-    List<String> errors = new ArrayList<String>();
+    List<String> errors = new ArrayList<>();
     for (ConstraintViolation<?> violation : ex.getConstraintViolations()) {
       errors.add(violation.getRootBeanClass().getName() + " " +
           violation.getPropertyPath() + ": " + violation.getMessage());
@@ -64,7 +59,26 @@ public class CustomExceptionHandle extends ResponseEntityExceptionHandler {
 
     ApiError apiError =
         new ApiError(HttpStatus.BAD_REQUEST, ex.getLocalizedMessage(), errors);
-    return new ResponseEntity<Object>(
+    return new ResponseEntity<>(
         apiError, new HttpHeaders(), apiError.getStatus());
   }
+
+  @ExceptionHandler(TaskNotFoundException.class)
+  public ResponseEntity<Object> handleTaskNotFoundException(TaskNotFoundException ex) {
+    ApiError apiError = new ApiError(HttpStatus.NOT_FOUND, ex.getMessage(), ex.getMessage());
+    return new ResponseEntity<>(apiError, HttpStatus.NOT_FOUND);
+  }
+
+  @ExceptionHandler(UserNotFoundException.class)
+  public ResponseEntity<Object> handleUserNotFoundException(UserNotFoundException ex) {
+    ApiError apiError = new ApiError(HttpStatus.NOT_FOUND, ex.getMessage(), ex.getMessage());
+    return new ResponseEntity<>(apiError, HttpStatus.NOT_FOUND);
+  }
+
+  @ExceptionHandler(InvalidTimelineException.class)
+  public ResponseEntity<Object> handleInvalidTimelineException(InvalidTimelineException ex) {
+    ApiError apiError = new ApiError(HttpStatus.NOT_FOUND, ex.getMessage(), ex.getMessage());
+    return new ResponseEntity<>(apiError, HttpStatus.NOT_FOUND);
+  }
+
 }

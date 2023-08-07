@@ -8,13 +8,13 @@ import org.springframework.integration.annotation.MessagingGateway;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.Payload;
 
-@MessagingGateway(errorChannel = ERROR_CHANNEL)
+@MessagingGateway()
 public interface IntegrationGateway {
 
   @Gateway(requestChannel = INPUT_CHANNEL, replyChannel = RESULT_CHANNEL)
-  <T> ResponseEntity<?> process(@Payload T payload, @Header("action") String action);
+  <T> ResponseEntity<Object> process(@Payload T payload, @Header("action") String action);
 
   @Gateway(requestChannel = INPUT_CHANNEL, replyChannel = RESULT_CHANNEL, payloadExpression = "''")
-  ResponseEntity<?> process(@Header("action") String action);
+  ResponseEntity<Object> process(@Header("action") String action);
 
 }

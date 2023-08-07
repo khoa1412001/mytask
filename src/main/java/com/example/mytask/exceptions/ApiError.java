@@ -1,4 +1,4 @@
-package com.example.mytask.exception;
+package com.example.mytask.exceptions;
 
 import java.util.Arrays;
 import java.util.List;
