@@ -1,10 +1,10 @@
 package com.example.mytask.config;
 
+import static com.example.mytask.constant.RoutePath.INPUT_CHANNEL;
 import static com.example.mytask.constant.RoutePath.RESULT_CHANNEL;
 import static com.example.mytask.constant.RoutePath.ROUTE_CHANNEL;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -23,6 +23,7 @@ import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.dsl.IntegrationFlowBuilder;
 import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.handler.ServiceActivatingHandler;
+import org.springframework.integration.router.HeaderValueRouter;
 
 @ExtendWith(MockitoExtension.class)
 class IntegrationConfigTest {
@@ -31,10 +32,16 @@ class IntegrationConfigTest {
   private IntegrationConfig integrationFlow;
 
   @Mock
+  private IntegrationFlowBuilder mockFlowBuilder;
+
+  @Mock
   private HandleLogRequest handleLogRequest;
 
   @Captor
   private ArgumentCaptor<ServiceActivatingHandler> serviceActivatingHandlerCapture;
+
+  @Captor
+  private ArgumentCaptor<HeaderValueRouter> headerValueRouterArgumentCaptor;
 
   @BeforeAll
   static void setupStatic() {
@@ -48,12 +55,29 @@ class IntegrationConfigTest {
   }
 
   @Test
-  void meDmvSimulatorChainShouldCallHandleOneTimesAndReturnResultChannel() {
-    IntegrationFlowBuilder mockFlowBuilder = mockIntegrationFlowBuilder();
+  void shouldReturnInputChannel() {
+    DirectChannel directChannel = integrationFlow.inputChannel();
+    assertThat(directChannel.getComponentName()).isEqualTo(INPUT_CHANNEL);
+  }
+
+  @Test
+  void shouldReturnOutputChannel() {
+    DirectChannel directChannel = integrationFlow.routerChannel();
+    assertThat(directChannel.getComponentName()).isEqualTo(ROUTE_CHANNEL);
+  }
+
+  @Test
+  void myFlowShouldCallHandleOneTimesAndReturnResultChannel() {
+    mockIntegrationFlowBuilder();
     integrationFlow.myFlow();
+
     verify(mockFlowBuilder).handle(serviceActivatingHandlerCapture.capture());
     verifyServiceActivatingHandler(serviceActivatingHandlerCapture.getAllValues());
-    verify(mockFlowBuilder).channel(ROUTE_CHANNEL);
+
+    verify(mockFlowBuilder).route(headerValueRouterArgumentCaptor.capture());
+    verifyHeaderValueRouter(headerValueRouterArgumentCaptor.getValue());
+
+    verify(mockFlowBuilder).get();
   }
 
   private void verifyServiceActivatingHandler(List<ServiceActivatingHandler> handlers) {
@@ -61,12 +85,14 @@ class IntegrationConfigTest {
     handlers.forEach(handler -> assertThat(handler).isInstanceOf(ServiceActivatingHandler.class));
   }
 
-  private IntegrationFlowBuilder mockIntegrationFlowBuilder() {
-    IntegrationFlowBuilder mockFlowBuilder = mock(IntegrationFlowBuilder.class);
+  private void verifyHeaderValueRouter(HeaderValueRouter router) {
+    assertThat(router).isInstanceOf(HeaderValueRouter.class);
+  }
+
+  private void mockIntegrationFlowBuilder() {
     when(IntegrationFlows.from(any(DirectChannel.class))).thenReturn(mockFlowBuilder);
-    when(mockFlowBuilder.handle(ArgumentMatchers.<ServiceActivatingHandler>any())).thenReturn(
-        mockFlowBuilder);
-    when(mockFlowBuilder.channel(ROUTE_CHANNEL)).thenReturn(mockFlowBuilder);
-    return mockFlowBuilder;
+    when(mockFlowBuilder.handle(ArgumentMatchers.<ServiceActivatingHandler>any()))
+        .thenReturn(mockFlowBuilder);
+    when(mockFlowBuilder.route(any(HeaderValueRouter.class))).thenReturn(mockFlowBuilder);
   }
 }
