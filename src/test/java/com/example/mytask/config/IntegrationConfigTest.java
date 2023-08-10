@@ -19,6 +19,7 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.dsl.IntegrationFlowBuilder;
 import org.springframework.integration.dsl.IntegrationFlows;
@@ -58,12 +59,6 @@ class IntegrationConfigTest {
   void shouldReturnInputChannel() {
     DirectChannel directChannel = integrationFlow.inputChannel();
     assertThat(directChannel.getComponentName()).isEqualTo(INPUT_CHANNEL);
-  }
-
-  @Test
-  void shouldReturnOutputChannel() {
-    DirectChannel directChannel = integrationFlow.routerChannel();
-    assertThat(directChannel.getComponentName()).isEqualTo(ROUTE_CHANNEL);
   }
 
   @Test

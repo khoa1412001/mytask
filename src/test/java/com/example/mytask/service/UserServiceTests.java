@@ -36,7 +36,7 @@ class UserServiceTests {
       "Scrum master");
 
   @Test
-  void whenGetAllUsers_shouldReturnList() throws Exception {
+  void testGetUsersWithNoError() throws Exception {
     List<User> mockUser = new ArrayList<>();
     mockUser.add(USER_RECORD1);
     mockUser.add(USER_RECORD2);
@@ -49,7 +49,7 @@ class UserServiceTests {
   }
 
   @Test
-  void whenGetUserById_thenReturnUser() throws Exception {
+  void testGetUserWithNoError() throws Exception {
     given(userRepository.findById(USER_RECORD1.getId())).willReturn(
         Optional.ofNullable(USER_RECORD1));
 
@@ -62,7 +62,7 @@ class UserServiceTests {
   }
 
   @Test
-  void whenGetNonExistUserId_thenThrowException() throws Exception {
+  void testUserWithError() throws Exception {
     int userId = 3;
     given(userRepository.findById(any(Integer.class))).willReturn(Optional.ofNullable(null));
 
@@ -74,7 +74,7 @@ class UserServiceTests {
   }
 
   @Test
-  void whenCreateUser_thenReturnUser() throws Exception {
+  void testCreateUserWithNoError() throws Exception {
     User user = User.builder()
         .name("Khoa")
         .role("Member")
@@ -93,7 +93,7 @@ class UserServiceTests {
   }
 
   @Test
-  void whenUpdateUser_thenReturnUser() throws Exception {
+  void testEditUserWithNoError() throws Exception {
     User user = User.builder()
         .id(1)
         .name("Khoa")
@@ -103,12 +103,23 @@ class UserServiceTests {
         .email("Khoa@gmail.com")
         .office("TV")
         .build();
-    given(userRepository.findById(1)).willReturn(Optional.ofNullable(USER_RECORD1));
+    given(userRepository.existsById(1)).willReturn(true);
     given(userRepository.save(user)).willReturn(user);
 
     User savedUser = userService.editUser(user);
 
     assertThat(savedUser.getDob()).isEqualTo(user.getDob());
+  }
+
+  @Test
+  void testEditUserWithErrors() throws Exception {
+    given(userRepository.existsById(any(Integer.class))).willReturn(false);
+
+    UserNotFoundException ex = assertThrows(UserNotFoundException.class,
+        () -> userService.editUser(USER_RECORD1));
+
+    assertThat(ex.getMessage()).isEqualTo("User could not be found");
+    verify(userRepository).existsById(any(Integer.class));
   }
 
 }

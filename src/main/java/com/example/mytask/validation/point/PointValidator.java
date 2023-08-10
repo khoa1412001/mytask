@@ -10,6 +10,6 @@ public class PointValidator implements ConstraintValidator<PointValidation, Inte
 
   @Override
   public boolean isValid(Integer point, ConstraintValidatorContext constraintValidatorContext) {
-    return POINT_LIST.contains(point) && (point != null);
+    return (point != null) && POINT_LIST.contains(point);
   }
 }

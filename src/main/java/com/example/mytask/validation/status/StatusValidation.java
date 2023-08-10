@@ -11,7 +11,7 @@ import javax.validation.Payload;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface StatusValidation {
 
-  String message() default "Invalid point";
+  String message() default "Invalid status";
 
   Class<?>[] groups() default {};
 

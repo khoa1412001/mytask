@@ -45,10 +45,6 @@ public class IntegrationConfig {
     return MessageChannels.direct(INPUT_CHANNEL).get();
   }
 
-  @Bean(name = ROUTE_CHANNEL)
-  public DirectChannel routerChannel() {
-    return MessageChannels.direct(ROUTE_CHANNEL).get();
-  }
 
   @Bean
   public IntegrationFlow myFlow() {
@@ -61,15 +57,6 @@ public class IntegrationConfig {
   public HeaderValueRouter router() {
     return new HeaderValueRouter("action");
   }
-
-//  @ServiceActivator(inputChannel = ERROR_CHANNEL)
-////  MessageHandlingException
-//  public ResponseEntity<Object> errorChannel(Exception payload) {
-//    payload.printStackTrace();
-//    logger.error(payload.getMessage());
-//    return new ResponseEntity<>(
-//        "An error occurred, please try again later", HttpStatus.BAD_REQUEST);
-//  }
 
   @ServiceActivator(inputChannel = GET_USERS_CHANNEL)
   public ResponseEntity<Object> getUsers() {

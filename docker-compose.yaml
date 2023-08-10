@@ -1,0 +1,8 @@
+version: '3'
+services:
+  api:
+    image: mytask
+    ports:
+      - 3000:3000
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

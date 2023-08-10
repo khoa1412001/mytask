@@ -3,7 +3,6 @@ package com.example.mytask.validation.status;
 
 import static com.example.mytask.constant.CONSTANT.STATUS_LIST;
 
-import java.util.Arrays;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 

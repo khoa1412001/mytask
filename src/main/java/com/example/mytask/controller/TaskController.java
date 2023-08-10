@@ -9,6 +9,7 @@ import com.example.mytask.dto.TaskDTO;
 import com.example.mytask.validation.timestamp.DateValidation;
 import java.util.HashMap;
 import java.util.Map;
+import javax.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -22,13 +23,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+@Validated
 @RestController
 @RequestMapping("api/v1/task")
-@Validated
 public class TaskController {
 
   @Autowired
   private IntegrationGateway integrationGateway;
+
+  @GetMapping
+  public ResponseEntity<Object> getTasks() {
+    return integrationGateway.process(GET_TASKS_CHANNEL);
+  }
 
   @GetMapping("/{id}")
   public ResponseEntity<Object> getTask(@PathVariable("id") int id) {
@@ -36,8 +42,8 @@ public class TaskController {
   }
 
   @PutMapping("/{id}")
-  public ResponseEntity<Object> editTask(@RequestBody TaskUpdateDTO taskUpdateDTO,
-      @PathVariable("id") int id) {
+  public ResponseEntity<Object> editTask(@RequestBody @Valid TaskUpdateDTO taskUpdateDTO,
+      @PathVariable("id") Integer id) {
     ModelMapper modelMapper = new ModelMapper();
     Task task = modelMapper.map(taskUpdateDTO, Task.class);
     task.setId(id);
@@ -45,7 +51,7 @@ public class TaskController {
   }
 
   @PostMapping()
-  public ResponseEntity<Object> createTask(@RequestBody TaskDTO taskDTO) {
+  public ResponseEntity<Object> createTask(@RequestBody @Valid TaskDTO taskDTO) {
     ModelMapper modelMapper = new ModelMapper();
     Task task = modelMapper.map(taskDTO, Task.class);
     return integrationGateway.process(task, CREATE_TASK_CHANNEL);

@@ -50,7 +50,7 @@ public class TaskServiceImpl implements TaskService {
   public Task getTask(int taskId) {
     Task task = taskRepository.findById(taskId)
         .orElseThrow(() -> new TaskNotFoundException(NOT_FOUND_TASK));
-    task.setRemaining(calculateRemaining(task.getLogwork(), task.getEst()));
+    task.setRemaining(calRemaining(task.getLogwork(), task.getEst()));
     return task;
   }
 
@@ -71,8 +71,8 @@ public class TaskServiceImpl implements TaskService {
 
     task.setAssignee(user);
     task.setDeadline(localDateToDate(calculateDeadline(task.getEst())));
-
-    return taskRepository.save(task);
+    taskRepository.save(task);
+    return task;
   }
 
   @Override
@@ -80,13 +80,13 @@ public class TaskServiceImpl implements TaskService {
     Task task = taskRepository.findById(taskId)
         .orElseThrow(() -> new TaskNotFoundException(NOT_FOUND_TASK));
 
-    if (timeBegin.compareTo(timeEnd) >= 0) {
+    if (!isValidTimeline(timeBegin, timeEnd)) {
       throw new InvalidTimelineException("Invalid timeline");
     }
     Logwork logwork = new Logwork(timeBegin, timeEnd);
     logwork.setTask(task);
-
-    return logworkRepository.save(logwork);
+    logworkRepository.save(logwork);
+    return logwork;
   }
 
   public LocalDate calculateDeadline(int est) {
@@ -101,11 +101,12 @@ public class TaskServiceImpl implements TaskService {
     return Date.valueOf(localDate);
   }
 
-  private String calculateRemaining(List<Logwork> logworkList, Integer est) {
+  private String calRemaining(List<Logwork> logworkList, Integer est) {
     Long remainingMS = est.longValue() * 3600 * 1000;
     for (Logwork lw : logworkList) {
       remainingMS = remainingMS - (lw.getTimeEnd().getTime() - lw.getTimeStart().getTime());
     }
+
     if (remainingMS < 0L) {
       return "This task is done";
     }
@@ -114,6 +115,26 @@ public class TaskServiceImpl implements TaskService {
     result = result.concat(String.format("%s hours ", hours));
 
     return result;
+  }
+
+  private boolean isValidTimeline(Timestamp timeBegin, Timestamp timeEnd) {
+
+    LocalDateTime ldtBegin = timeBegin.toLocalDateTime();
+    LocalDateTime ldtEnd = timeEnd.toLocalDateTime();
+
+    if (timeBegin.compareTo(timeEnd) >= 0) {
+      return false;
+    }
+
+    if (ldtEnd.getYear() != ldtBegin.getYear()) {
+      return false;
+    }
+
+    if (ldtEnd.getMonthValue() != ldtBegin.getMonthValue()) {
+      return false;
+    }
+    return ldtEnd.getDayOfMonth() == ldtBegin.getDayOfMonth();
+
   }
 }
 
