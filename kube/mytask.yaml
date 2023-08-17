@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mytask
+  labels:
+    app: mytask
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mytask
+  template:
+    metadata:
+      labels:
+        app: mytask
+    spec:
+      containers:
+        - image: khoa141/mytask
+          name: mytask
+          ports:
+            - containerPort: 3000
+          env:
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: mysql-password
+            - name: DB_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: mytask-configmap
+                  key: database_url
+---
+apiVersion: v1
+metadata:
+  name: mytask-service
+kind: Service
+spec:
+  selector:
+    app: mytask
+  ports:
+    - port: 80
+      targetPort: 3000
