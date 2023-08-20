@@ -1,7 +1,5 @@
-FROM adoptopenjdk/openjdk11 as build
+FROM adoptopenjdk/openjdk11
 
-ARG JAR_FILE=target/*.jar
+COPY target/mytask-0.0.1-SNAPSHOT.jar mytask.jar
 
-COPY ${JAR_FILE} app.jar
-
-ENTRYPOINT ["java","-jar","/app.jar"]
+ENTRYPOINT ["java","-jar","/mytask.jar"]
